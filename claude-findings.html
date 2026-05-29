@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fairy Tale Findings · Distant Reading</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        :root {
+            --color-text-primary: #1a1612;
+            --color-text-secondary: #7a6f65;
+            --color-border-tertiary: rgba(26,22,18,0.1);
+            --color-background-secondary: #f4f1ec;
+            --border-radius-md: 10px;
+            --bg: #faf7f2;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--color-text-primary);
+            min-height: 100vh;
+            padding: 2.5rem 1.5rem 4rem;
+        }
+        .page-header {
+            max-width: 680px;
+            margin: 0 auto 2.5rem;
+        }
+        .back-link {
+            display: inline-block;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            margin-bottom: 1.25rem;
+        }
+        .back-link:hover { color: var(--color-text-primary); }
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .page-header p {
+            font-size: 0.92rem;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+        .inner {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        /* --- fragment styles --- */
+        .section { margin-bottom: 2.5rem; }
+        .section-label {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            margin-bottom: .5rem;
+            font-family: 'DM Mono', monospace;
+        }
+        .finding-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--color-text-primary);
+            margin-bottom: .25rem;
+            font-family: 'Playfair Display', serif;
+        }
+        .finding-sub {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+        .leg-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            display: inline-block;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+        .divider {
+            border: none;
+            border-top: 0.5px solid var(--color-border-tertiary);
+            margin: 2rem 0;
+        }
+        .insight-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+        .insight-card {
+            background: var(--color-background-secondary);
+            border-radius: var(--border-radius-md);
+            padding: .875rem 1rem;
+        }
+        .insight-card .ic-val {
+            font-size: 22px;
+            font-weight: 500;
+            margin-bottom: 2px;
+            font-family: 'Playfair Display', serif;
+        }
+        .insight-card .ic-label {
+            font-size: 11px;
+            color: var(--color-text-secondary);
+            line-height: 1.4;
+        }
+        .bubble-wrap { position: relative; height: 260px; }
+    </style>
+</head>
+<body>
+<div class="page-header">
+    <a class="back-link" href="home.html">← All analyses</a>
+    <h1>Key Findings · Distant Reading</h1>
+    <p>Five data-driven findings comparing Andersen's Fairy Tales, Arabian Nights, and Grimms' Fairy Tales across authority, interiority, signature vocabulary, family roles, and the natural world.</p>
+</div>
+
+<div class="inner">
+
+<div class="section">
+  <div class="section-label">Finding 1</div>
+  <div class="finding-title">Power words: who governs each tradition</div>
+  <div class="finding-sub">The single most diagnostic word per corpus: <em>king</em> dominates Grimms at 13× the rate it appears in Andersen, while Arabian Nights revolves around the <em>sultan</em> — a term absent from the other two.</div>
+  <div class="legend">
+    <span><span class="leg-dot" style="background:#1D9E75"></span>Andersen</span>
+    <span><span class="leg-dot" style="background:#EF9F27"></span>Arabian Nights</span>
+    <span><span class="leg-dot" style="background:#7F77DD"></span>Grimms</span>
+  </div>
+  <div style="position:relative;height:260px">
+    <canvas id="chart1" role="img" aria-label="Grouped bar chart comparing authority word frequencies across three fairy tale corpora">Andersen: king 28, sultan 0, emperor 12. Arabian Nights: king 171, sultan 349, emperor 3. Grimms: king 368, sultan 0, emperor 8.</canvas>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+  <div class="section-label">Finding 2</div>
+  <div class="finding-title">Interiority vs. action: heart, death, and gold</div>
+  <div class="finding-sub">Grimms and Andersen use <em>heart</em> far more than Arabian Nights — suggesting a European emphasis on feeling and interiority. Arabian Nights leads heavily on <em>gold</em> and <em>death</em>, signalling a tradition driven by material stakes and consequence.</div>
+  <div class="legend">
+    <span><span class="leg-dot" style="background:#1D9E75"></span>Andersen</span>
+    <span><span class="leg-dot" style="background:#EF9F27"></span>Arabian Nights</span>
+    <span><span class="leg-dot" style="background:#7F77DD"></span>Grimms</span>
+  </div>
+  <div style="position:relative;height:220px">
+    <canvas id="chart2" role="img" aria-label="Grouped bar chart showing heart, death, and gold word frequencies across three corpora">Heart: Andersen 51, Arabian 28, Grimms 73. Death: Andersen 29, Arabian 78, Grimms 26. Gold: Andersen 22, Arabian 110, Grimms 89.</canvas>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+  <div class="section-label">Finding 3</div>
+  <div class="finding-title">Signature words: what each corpus owns exclusively</div>
+  <div class="finding-sub">Some words are so concentrated in one corpus they function as fingerprints. <em>Shadow</em> is almost entirely Andersen's (85 vs. 0/0). <em>Lamp</em> belongs to Arabian Nights (90 vs. 5/2). <em>Forest</em> is Grimms' domain.</div>
+  <div class="insight-row">
+    <div class="insight-card">
+      <div class="ic-val" style="color:#1D9E75">shadow</div>
+      <div style="margin:8px 0 4px;font-size:12px;color:var(--color-text-secondary)">Andersen 85 &nbsp;·&nbsp; Arabian 0 &nbsp;·&nbsp; Grimms 0</div>
+      <div class="ic-label">Unique to Andersen — almost entirely "The Shadow" tale</div>
+    </div>
+    <div class="insight-card">
+      <div class="ic-val" style="color:#EF9F27">lamp</div>
+      <div style="margin:8px 0 4px;font-size:12px;color:var(--color-text-secondary)">Andersen 5 &nbsp;·&nbsp; Arabian 90 &nbsp;·&nbsp; Grimms 2</div>
+      <div class="ic-label">Arabian Nights signature — synonymous with Aladdin</div>
+    </div>
+    <div class="insight-card">
+      <div class="ic-val" style="color:#7F77DD">forest</div>
+      <div style="margin:8px 0 4px;font-size:12px;color:var(--color-text-secondary)">Andersen 20 &nbsp;·&nbsp; Arabian 23 &nbsp;·&nbsp; Grimms 85</div>
+      <div class="ic-label">Grimms' world is the forest — wilderness as moral space</div>
+    </div>
+  </div>
+  <div style="position:relative;height:180px;margin-top:.5rem">
+    <canvas id="chart3" role="img" aria-label="Horizontal bar chart showing signature word concentrations">shadow: Andersen 85, Arabian 0, Grimms 0. lamp: Andersen 5, Arabian 90, Grimms 2. forest: Andersen 20, Arabian 23, Grimms 85.</canvas>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+  <div class="section-label">Finding 4</div>
+  <div class="finding-title">The shared feminine: mother, princess, and the family axis</div>
+  <div class="finding-sub"><em>Mother</em> and <em>princess</em> are the two most cross-traditional terms. Father skews heavily Grimms — the paternal authority figure is a Grimms archetype, not an Andersen one. Arabian Nights gives the most weight to the princess as a narrative object.</div>
+  <div class="legend">
+    <span><span class="leg-dot" style="background:#1D9E75"></span>Andersen</span>
+    <span><span class="leg-dot" style="background:#EF9F27"></span>Arabian Nights</span>
+    <span><span class="leg-dot" style="background:#7F77DD"></span>Grimms</span>
+  </div>
+  <div style="position:relative;height:220px">
+    <canvas id="chart4" role="img" aria-label="Grouped bar chart showing family and gender role word frequencies">Princess: Andersen 84, Arabian 290, Grimms 103. Mother: Andersen 61, Arabian 158, Grimms 154. Father: Andersen 15, Arabian 82, Grimms 183.</canvas>
+  </div>
+</div>
+
+<hr class="divider">
+
+<div class="section">
+  <div class="section-label">Finding 5</div>
+  <div class="finding-title">The natural world: sea, water, bird</div>
+  <div class="finding-sub">Arabian Nights is a maritime tradition — <em>sea</em> appears 4× more than in Andersen. <em>Bird</em> is Grimms' most frequent nature word, embedded in tales like The Golden Bird. Andersen, a coastal Dane, is surprisingly restrained on the sea — his water imagery is more intimate.</div>
+  <div class="legend">
+    <span><span class="leg-dot" style="background:#1D9E75"></span>Andersen</span>
+    <span><span class="leg-dot" style="background:#EF9F27"></span>Arabian Nights</span>
+    <span><span class="leg-dot" style="background:#7F77DD"></span>Grimms</span>
+  </div>
+  <div style="position:relative;height:200px">
+    <canvas id="chart5" role="img" aria-label="Grouped bar chart of nature words sea, water, bird across three corpora">Sea: Andersen 13, Arabian 110, Grimms 31. Water: Andersen 43, Arabian 73, Grimms 113. Bird: Andersen 16, Arabian 71, Grimms 121.</canvas>
+  </div>
+</div>
+
+</div><!-- .inner -->
+
+<script>
+const AN='#1D9E75', AR='#EF9F27', GR='#7F77DD';
+const defaults={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:12}}},y:{grid:{color:'rgba(128,128,128,0.1)'},ticks:{font:{size:11}}}}};
+
+new Chart(document.getElementById('chart1'),{type:'bar',data:{labels:['king','sultan','emperor'],datasets:[{label:'Andersen',data:[28,0,12],backgroundColor:AN,borderWidth:0},{label:'Arabian Nights',data:[171,349,3],backgroundColor:AR,borderWidth:0},{label:'Grimms',data:[368,0,8],backgroundColor:GR,borderWidth:0}]},options:{...defaults,scales:{x:{...defaults.scales.x},y:{...defaults.scales.y,beginAtZero:true}}}});
+
+new Chart(document.getElementById('chart2'),{type:'bar',data:{labels:['heart','death','gold'],datasets:[{label:'Andersen',data:[51,29,22],backgroundColor:AN,borderWidth:0},{label:'Arabian Nights',data:[28,78,110],backgroundColor:AR,borderWidth:0},{label:'Grimms',data:[73,26,89],backgroundColor:GR,borderWidth:0}]},options:{...defaults,scales:{x:{...defaults.scales.x},y:{...defaults.scales.y,beginAtZero:true}}}});
+
+new Chart(document.getElementById('chart3'),{type:'bar',data:{labels:['shadow','lamp','forest'],datasets:[{label:'Andersen',data:[85,5,20],backgroundColor:AN,borderWidth:0},{label:'Arabian Nights',data:[0,90,23],backgroundColor:AR,borderWidth:0},{label:'Grimms',data:[0,2,85],backgroundColor:GR,borderWidth:0}]},options:{...defaults,indexAxis:'y',scales:{y:{...defaults.scales.x},x:{...defaults.scales.y,beginAtZero:true}}}});
+
+new Chart(document.getElementById('chart4'),{type:'bar',data:{labels:['princess','mother','father'],datasets:[{label:'Andersen',data:[84,61,15],backgroundColor:AN,borderWidth:0},{label:'Arabian Nights',data:[290,158,82],backgroundColor:AR,borderWidth:0},{label:'Grimms',data:[103,154,183],backgroundColor:GR,borderWidth:0}]},options:{...defaults,scales:{x:{...defaults.scales.x},y:{...defaults.scales.y,beginAtZero:true}}}});
+
+new Chart(document.getElementById('chart5'),{type:'bar',data:{labels:['sea','water','bird'],datasets:[{label:'Andersen',data:[13,43,16],backgroundColor:AN,borderWidth:0},{label:'Arabian Nights',data:[110,73,71],backgroundColor:AR,borderWidth:0},{label:'Grimms',data:[31,113,121],backgroundColor:GR,borderWidth:0}]},options:{...defaults,scales:{x:{...defaults.scales.x},y:{...defaults.scales.y,beginAtZero:true}}}});
+</script>
+</body>
+</html>
