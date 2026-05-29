@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Folklore Structural Analysis Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-slate: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border-color: #e2e8f0;
+
+            --grimm-color: #10b981;
+            --arabian-color: #f59e0b;
+            --andersen-color: #3b82f6;
+
+            --good-path: #22c55e;
+            --bad-path: #ef4444;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-slate);
+            color: var(--text-main);
+            margin: 0;
+            padding: 24px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            display: inline-block;
+            font-family: monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 1.25rem;
+        }
+        .back-link:hover { color: var(--text-main); }
+
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 4px solid #3b82f6;
+        }
+
+        header h1 {
+            margin: 0 0 8px 0;
+            font-size: 2.25rem;
+            font-weight: 800;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .viz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+
+        .card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .card .description {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 12px;
+        }
+
+        .canvas-container {
+            position: relative;
+            height: 340px;
+            width: 100%;
+        }
+
+        /* Moral Matrix Visual Grid Styles */
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .matrix-column {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+
+        .matrix-header {
+            padding: 12px 16px;
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 1.1rem;
+        }
+        .bg-grimm { background-color: var(--grimm-color); }
+        .bg-arabian { background-color: var(--arabian-color); }
+        .bg-andersen { background-color: var(--andersen-color); }
+
+        .matrix-body {
+            padding: 16px;
+        }
+
+        .path-block {
+            margin-bottom: 14px;
+            background: #ffffff;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .path-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .path-good { color: var(--good-path); }
+        .path-bad { color: var(--bad-path); }
+        .path-result { color: #4f46e5; }
+
+        .path-content {
+            font-size: 0.9rem;
+            color: #334155;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .viz-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a class="back-link" href="index.html">← All analyses</a>
+
+    <header>
+        <h1>Folklore Structural Visualizations</h1>
+        <p>Mapping Human Nature, Mobility, and Moral Matrices across Literary Traditions</p>
+    </header>
+
+    <div class="viz-grid">
+        <div class="card">
+            <h2>1. Character Archetype vs. Psychological Interiority</h2>
+            <p class="description">Mapping character positions based on psychological complexity versus depth of socio-economic/civic integration.</p>
+            <div class="canvas-container">
+                <canvas id="scatterMatrixChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>2. Narrative Arc and Social Mobility</h2>
+            <p class="description">Visualizing the standard geometric progression curves of character status fluctuations over time.</p>
+            <div class="canvas-container">
+                <canvas id="mobilityArcChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card full-width">
+            <h2>3. The Moral Framework Matrix</h2>
+            <p class="description">Structural pathways linking functional behaviors directly to universal systems of rewards and dynamic consequences.</p>
+
+            <div class="matrix-grid">
+                <div class="matrix-column">
+                    <div class="matrix-header bg-grimm">Brothers Grimm: Contractual Morality</div>
+                    <div class="matrix-body">
+                        <div class="path-block">
+                            <div class="path-title path-good">● Good Path Triggers</div>
+                            <p class="path-content">Compliance with guide advice, hospitality to poor strangers, showing kindness to woodland animals.</p>
+                        </div>
+                        <div class="path-block">
+                            <div class="path-title path-bad">● Bad Path Triggers</div>
+                            <p class="path-content">Vanity/Pride, active physical cruelty, violating explicit taboos or opening forbidden doors.</p>
+                        </div>
+                        <div class="path-block" style="border-left: 4px solid #4f46e5;">
+                            <div class="path-title path-result">■ Structural Result</div>
+                            <p class="path-content"><strong>Absolute Physical Justice:</strong> The good inherit stable earthy kingdoms; the wicked face immediate, brutal physical punishments.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="matrix-column">
+                    <div class="matrix-header bg-arabian">Arabian Nights: Transactional &amp; Cosmic</div>
+                    <div class="matrix-body">
+                        <div class="path-block">
+                            <div class="path-title path-good">● Good Path Triggers</div>
+                            <p class="path-content">Generosity, unyielding hospitality, respecting the bond of salt, deployment of wit and sharp intellect (Aql).</p>
+                        </div>
+                        <div class="path-block">
+                            <div class="path-title path-bad">● Bad Path Triggers</div>
+                            <p class="path-content">Betrayal of fraternal bonds, economic fraud or severe covetousness, proud hubris against fate or God.</p>
+                        </div>
+                        <div class="path-block" style="border-left: 4px solid #4f46e5;">
+                            <div class="path-title path-result">■ Structural Result</div>
+                            <p class="path-content"><strong>Restoration of Honor &amp; Fortune:</strong> Dynamic return to financial abundance and high political standing aligned with divine destiny.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="matrix-column">
+                    <div class="matrix-header bg-andersen">Hans Christian Andersen: Pietistic Spiritual</div>
+                    <div class="matrix-body">
+                        <div class="path-block">
+                            <div class="path-title path-good">● Good Path Triggers</div>
+                            <p class="path-content">Absolute self-sacrificial love, preserving pure childlike innocence, speaking unvarnished plain truth.</p>
+                        </div>
+                        <div class="path-block">
+                            <div class="path-title path-bad">● Bad Path Triggers</div>
+                            <p class="path-content">Superficial vanity, cynical worldviews, cold calculations leading to an explicit loss of empathy.</p>
+                        </div>
+                        <div class="path-block" style="border-left: 4px solid #4f46e5;">
+                            <div class="path-title path-result">■ Structural Result</div>
+                            <p class="path-content"><strong>Spiritual Transcendence:</strong> Resolution decoupled from earth rewards. Protagonists may perish physically but achieve eternal grace.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. SCATTER MATRIX
+    const ctxScatter = document.getElementById('scatterMatrixChart').getContext('2d');
+    new Chart(ctxScatter, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                {
+                    label: "Grimms' Tales Cluster",
+                    data: [{x: 1.5, y: 2.0}],
+                    backgroundColor: '#10b981',
+                    pointRadius: 14,
+                    pointHoverRadius: 16
+                },
+                {
+                    label: "Arabian Nights Cluster",
+                    data: [{x: 8.0, y: 5.0}],
+                    backgroundColor: '#f59e0b',
+                    pointRadius: 14,
+                    pointHoverRadius: 16
+                },
+                {
+                    label: "Andersen's Tales Cluster",
+                    data: [{x: 2.5, y: 9.0}],
+                    backgroundColor: '#3b82f6',
+                    pointRadius: 14,
+                    pointHoverRadius: 16
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    min: 0, max: 10,
+                    title: { display: true, text: 'Socio-Economic & Civic Context →', font: { weight: 'bold' } },
+                    grid: { color: '#f1f5f9' }
+                },
+                y: {
+                    min: 0, max: 10,
+                    title: { display: true, text: 'Psychological Complexity / Interiority →', font: { weight: 'bold' } },
+                    grid: { color: '#f1f5f9' }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            if (context.datasetIndex === 0) return "Grimm: Flat structural plot mechanisms.";
+                            if (context.datasetIndex === 1) return "Arabian Nights: Entangled urban/mercantile networks.";
+                            if (context.datasetIndex === 2) return "Andersen: Intense interior existential focus.";
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 2. NARRATIVE MOBILITY ARC
+    const ctxArc = document.getElementById('mobilityArcChart').getContext('2d');
+    new Chart(ctxArc, {
+        type: 'line',
+        data: {
+            labels: ['Exposition', 'Inciting Incident', 'Rising Trial', 'Climax', 'Resolution'],
+            datasets: [
+                {
+                    label: "Grimm: Linear Ascent",
+                    data: [1, 2, 4, 7, 10],
+                    borderColor: '#10b981',
+                    backgroundColor: 'transparent',
+                    borderWidth: 3,
+                    tension: 0.1
+                },
+                {
+                    label: "Arabian Nights: Cyclical Wave",
+                    data: [5, 1, 9, 2, 8],
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'transparent',
+                    borderWidth: 3,
+                    tension: 0.4
+                },
+                {
+                    label: "Andersen: Spiritual Arc",
+                    data: [4, 5, 3, 1, 9],
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'transparent',
+                    borderWidth: 3,
+                    borderDash: [6, 4],
+                    tension: 0.2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    min: 0, max: 11,
+                    ticks: {
+                        callback: function(value) {
+                            if (value === 1) return 'Ruin/Poverty';
+                            if (value === 5) return 'Baseline Status';
+                            if (value === 10) return 'Kingdom/Grace';
+                            return '';
+                        }
+                    },
+                    title: { display: true, text: 'Status / Prosperity Level', font: { weight: 'bold' } }
+                },
+                x: {
+                    title: { display: true, text: 'Narrative Progression Flow →', font: { weight: 'bold' } }
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
