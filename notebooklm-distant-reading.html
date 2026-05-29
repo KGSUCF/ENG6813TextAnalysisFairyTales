@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distant Reading: Fairy Tale DNA Summary</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: auto; padding: 20px; }
+        h1, h2 { color: #2c3e50; }
+        .box { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; background: #f9f9f9; }
+        .word-cloud { text-align: center; border: 1px solid #ccc; padding: 20px; background: #fff; }
+        .freq-1 { font-size: 3em; font-weight: bold; }
+        .freq-2 { font-size: 2em; font-weight: bold; }
+        .freq-3 { font-size: 1.5em; }
+        .concordance ul { list-style-type: none; padding-left: 0; }
+        .concordance li { margin-bottom: 10px; font-style: italic; }
+        .citation { font-size: 0.8em; color: #7f8c8d; font-style: normal; }
+    </style>
+</head>
+<body>
+    <h1>Distant Reading Analysis Summary</h1>
+    <p>This report synthesizes a computational analysis across Grimms' Fairy Tales, Andersen's Fairy Tales, and The Arabian Nights.</p>
+
+    <div class="box">
+        <h2>1. Bag of Words (Core Vocabulary)</h2>
+        <p>The shared vocabulary across these three sources is categorized into pillars of governance, family, and enchantment. Significant content words include:</p>
+        <ul>
+            <li><strong>Royal Figures:</strong> King, Sultan, Emperor, Prince, Princess.</li>
+            <li><strong>Family Units:</strong> Son, Daughter, Brother, Sister, Mother.</li>
+            <li><strong>Natural World:</strong> Forest, Sea, Garden, Bird, Tree, Water.</li>
+            <li><strong>Magic:</strong> Enchanted, Magic, Fairy, Genie, Spell.</li>
+        </ul>
+    </div>
+
+    <div class="box">
+        <h2>2. Conceptual Word Cloud</h2>
+        <div class="word-cloud">
+            <span class="freq-1">KING / SULTAN</span><br>
+            <span class="freq-2">PRINCESS / PRINCE</span><br>
+            <span class="freq-3">GOLDEN / MAGIC / BIRD / OLD / SEA / HEART / FOREST</span>
+        </div>
+    </div>
+
+    <div class="box">
+        <h2>3. Topic Modeling</h2>
+        <p>Four primary thematic clusters appear consistently across the collections:</p>
+        <ul>
+            <li><strong>Sovereign Trials:</strong> Narrative arcs where a monarch's authority initiates a moral test or quest.</li>
+            <li><strong>Metamorphosis:</strong> Transformations between human, animal, and mineral states.</li>
+            <li><strong>Familial Betrayal and Loyalty:</strong> Conflicts involving sibling rivalry or parental protection.</li>
+            <li><strong>Geography of the Unknown:</strong> High frequency of travel across seas and into vast deserts or mountains.</li>
+        </ul>
+    </div>
+
+    <div class="box concordance">
+        <h2>4. Concordance of Key Terms</h2>
+        <ul>
+            <li><strong>KING / SULTAN:</strong> "A certain <strong>king</strong> had a beautiful garden..." / "The <strong>Sultan</strong> of the Indies, whose palace is covered with one hundred thousand rubies...".</li>
+            <li><strong>GOLDEN:</strong> "...a <strong>bird</strong> came flying that was of pure <strong>gold</strong>..." / "The <strong>Golden</strong> Water... rises up in the middle like a fountain...".</li>
+            <li><strong>BIRD:</strong> "<strong>Talking Bird</strong>, so singular a creature..." / "...a beautiful snow-white <strong>bird</strong> sitting on a bough...".</li>
+            <li><strong>OLD:</strong> "...there lived an <strong>old</strong> man, who wore plush breeches..." / "He then perceived on the roadside a hideous <strong>old</strong> man... this <strong>old</strong> man was a dervish...".</li>
+        </ul>
+    </div>
+</body>
+</html>
