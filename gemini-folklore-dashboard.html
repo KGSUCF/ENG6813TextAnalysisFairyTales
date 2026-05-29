@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distant Reading Dashboard: Folklore Corpora</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-orange: #f97316;
+            --accent-purple: #8b5cf6;
+            --border-color: #cbd5e1;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 24px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 4px solid var(--accent-blue);
+        }
+
+        header h1 {
+            margin: 0 0 8px 0;
+            font-size: 2.25rem;
+            font-weight: 800;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 1.125rem;
+            margin: 0;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .card h2 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-size: 1.35rem;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+
+        /* Bag of Words Styles */
+        .table-wrapper {
+            max-height: 320px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 10px 14px;
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:not(:last-child) td {
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .td-rank {
+            font-weight: bold;
+            color: var(--accent-blue);
+            width: 60px;
+        }
+
+        /* Word Cloud Styles */
+        .word-cloud {
+            background-color: #f8fafc;
+            border: 2px dashed #e2e8f0;
+            border-radius: 6px;
+            padding: 20px;
+            height: 280px;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: center;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cloud-item {
+            display: inline-block;
+            line-height: 1;
+            transition: transform 0.2s ease;
+            cursor: default;
+        }
+
+        .cloud-item:hover {
+            transform: scale(1.15);
+        }
+
+        .weight-5 { font-size: 3.25rem; font-weight: 800; color: #0f172a; }
+        .weight-4 { font-size: 2.25rem; font-weight: 700; color: #1e293b; }
+        .weight-3 { font-size: 1.65rem; font-weight: 600; color: var(--accent-blue); }
+        .weight-2 { font-size: 1.25rem; font-weight: 500; color: #0d9488; }
+        .weight-1 { font-size: 1rem; font-weight: 400; color: var(--text-muted); }
+
+        /* Topic Modeling Styles */
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .topic-box {
+            background: #f8fafc;
+            border-top: 4px solid var(--accent-blue);
+            border-radius: 4px;
+            padding: 16px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .topic-box:nth-child(2) { border-top-color: var(--accent-green); }
+        .topic-box:nth-child(3) { border-top-color: var(--accent-orange); }
+        .topic-box:nth-child(4) { border-top-color: var(--accent-purple); }
+
+        .topic-box h3 {
+            margin: 0 0 8px 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .keywords {
+            font-family: monospace;
+            font-size: 0.9rem;
+            background-color: #ffffff;
+            padding: 6px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            color: #334155;
+            margin-bottom: 8px;
+        }
+
+        .topic-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* Concordance Styles */
+        .selector-area {
+            margin-bottom: 16px;
+        }
+
+        .selector-area label {
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        select {
+            padding: 8px 12px;
+            font-size: 0.95rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        .kwic-container {
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: #ffffff;
+            overflow: hidden;
+        }
+
+        .kwic-row {
+            display: none;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 16px;
+            padding: 10px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.95rem;
+        }
+
+        .kwic-row.visible {
+            display: grid;
+        }
+
+        .kwic-left {
+            text-align: right;
+            color: var(--text-muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .kwic-keyword {
+            font-weight: bold;
+            color: #dc2626;
+            background-color: #fee2e2;
+            padding: 0 6px;
+            border-radius: 3px;
+        }
+
+        .kwic-right {
+            text-align: left;
+            color: var(--text-muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .badge {
+            font-family: sans-serif;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-right: 8px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .b-grimm { background-color: #dcfce7; color: #166534; }
+        .b-arabian { background-color: #ffedd5; color: #9a3412; }
+        .b-andersen { background-color: #dbeafe; color: #1e40af; }
+
+        @media (max-width: 768px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .kwic-row { grid-template-columns: 1fr; gap: 4px; text-align: left; }
+            .kwic-left { text-align: left; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Folklore Corpora Distant Reading Dashboard</h1>
+        <p>Textual Mining across Andersen, Arabian Nights, and Grimms' Fairy Tales</p>
+    </header>
+
+    <div class="dashboard-grid">
+        <div class="card">
+            <h2>1. Bag of Words (Top 15 Token Frequencies)</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="td-rank">Rank</th>
+                            <th>Term</th>
+                            <th>Total Frequency</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="td-rank">1</td><td>king</td><td>2,144</td></tr>
+                        <tr><td class="td-rank">2</td><td>said</td><td>2,089</td></tr>
+                        <tr><td class="td-rank">3</td><td>little</td><td>1,432</td></tr>
+                        <tr><td class="td-rank">4</td><td>one</td><td>1,351</td></tr>
+                        <tr><td class="td-rank">5</td><td>prince</td><td>911</td></tr>
+                        <tr><td class="td-rank">6</td><td>princess</td><td>843</td></tr>
+                        <tr><td class="td-rank">7</td><td>went</td><td>812</td></tr>
+                        <tr><td class="td-rank">8</td><td>came</td><td>794</td></tr>
+                        <tr><td class="td-rank">9</td><td>man</td><td>786</td></tr>
+                        <tr><td class="td-rank">10</td><td>time</td><td>711</td></tr>
+                        <tr><td class="td-rank">11</td><td>great</td><td>684</td></tr>
+                        <tr><td class="td-rank">12</td><td>good</td><td>652</td></tr>
+                        <tr><td class="td-rank">13</td><td>told</td><td>598</td></tr>
+                        <tr><td class="td-rank">14</td><td>day</td><td>572</td></tr>
+                        <tr><td class="td-rank">15</td><td>night</td><td>511</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>2. Word Cloud Visual Weights</h2>
+            <div class="word-cloud">
+                <span class="cloud-item weight-5">king</span>
+                <span class="cloud-item weight-5">said</span>
+                <span class="cloud-item weight-4">little</span>
+                <span class="cloud-item weight-4">prince</span>
+                <span class="cloud-item weight-4">princess</span>
+                <span class="cloud-item weight-3">went</span>
+                <span class="cloud-item weight-3">came</span>
+                <span class="cloud-item weight-3">man</span>
+                <span class="cloud-item weight-3">time</span>
+                <span class="cloud-item weight-2">great</span>
+                <span class="cloud-item weight-2">good</span>
+                <span class="cloud-item weight-2">told</span>
+                <span class="cloud-item weight-2">day</span>
+                <span class="cloud-item weight-2">night</span>
+                <span class="cloud-item weight-1">gold</span>
+                <span class="cloud-item weight-1">old</span>
+                <span class="cloud-item weight-1">poor</span>
+                <span class="cloud-item weight-1">queen</span>
+                <span class="cloud-item weight-1">brother</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-bottom: 24px;">
+        <h2>3. Topic Modeling (Latent Theme Clusters via Co-occurrence)</h2>
+        <div class="topic-grid">
+            <div class="topic-box">
+                <h3>Topic 1: Royal Structure</h3>
+                <div class="keywords">king prince princess queen marry palace</div>
+                <p class="topic-desc">Socio-political framework representing power restoration and status resolution common across all texts.</p>
+            </div>
+            <div class="topic-box">
+                <h3>Topic 2: Vulnerability &amp; Magic</h3>
+                <div class="keywords">little poor old bird forest tears witch</div>
+                <p class="topic-desc">Moral and psychological landscape prominent in Western European traditions (Grimm and Andersen).</p>
+            </div>
+            <div class="topic-box">
+                <h3>Topic 3: Mercantile Adventure</h3>
+                <div class="keywords">gold merchant city slave journey vizier</div>
+                <p class="topic-desc">Dynamic urban and trade setting representing fluctuating fortunes unique to Arabian Nights.</p>
+            </div>
+            <div class="topic-box">
+                <h3>Topic 4: Structural Transitions</h3>
+                <div class="keywords">said went came day night heard time</div>
+                <p class="topic-desc">Formulaic syntax tags maintaining momentum and chronological shifts in oral framing devices.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>4. Key Word in Context (KWIC) Concordance Viewer</h2>
+        <div class="selector-area">
+            <label for="kwic-selector">Select Analytical Focus Term:</label>
+            <select id="kwic-selector" onchange="filterKwic()">
+                <option value="gold">GOLD / GOLDEN</option>
+                <option value="little">LITTLE</option>
+                <option value="forest">FOREST / WOODS</option>
+            </select>
+        </div>
+
+        <div class="kwic-container">
+            <div class="kwic-row gold visible">
+                <div class="kwic-left"><span class="badge b-grimm">Grimm</span>... the bird let fall a</div>
+                <div class="kwic-keyword">golden</div>
+                <div class="kwic-right">feather from its wing and ...</div>
+            </div>
+            <div class="kwic-row gold visible">
+                <div class="kwic-left"><span class="badge b-arabian">Arabian</span>... opened the jars expecting to find</div>
+                <div class="kwic-keyword">gold</div>
+                <div class="kwic-right">coin instead of olives ...</div>
+            </div>
+            <div class="kwic-row gold visible">
+                <div class="kwic-left"><span class="badge b-andersen">Andersen</span>... she wore a tiny crown of pure</div>
+                <div class="kwic-keyword">gold</div>
+                <div class="kwic-right">on her head and smiled ...</div>
+            </div>
+
+            <div class="kwic-row little">
+                <div class="kwic-left"><span class="badge b-andersen">Andersen</span>... out into the street walked the poor</div>
+                <div class="kwic-keyword">little</div>
+                <div class="kwic-right">match girl with bare feet ...</div>
+            </div>
+            <div class="kwic-row little">
+                <div class="kwic-left"><span class="badge b-grimm">Grimm</span>... the bold and fearless</div>
+                <div class="kwic-keyword">little</div>
+                <div class="kwic-right">tailor took out his needle ...</div>
+            </div>
+            <div class="kwic-row little">
+                <div class="kwic-left"><span class="badge b-arabian">Arabian</span>... and presently a</div>
+                <div class="kwic-keyword">little</div>
+                <div class="kwic-right">door opened in the solid wall ...</div>
+            </div>
+
+            <div class="kwic-row forest">
+                <div class="kwic-left"><span class="badge b-grimm">Grimm</span>... they wandered deep into the</div>
+                <div class="kwic-keyword">forest</div>
+                <div class="kwic-right">until they lost their way ...</div>
+            </div>
+            <div class="kwic-row forest">
+                <div class="kwic-left"><span class="badge b-andersen">Andersen</span>... the wild swans flew over the dark</div>
+                <div class="kwic-keyword">forest</div>
+                <div class="kwic-right">and out towards the sea ...</div>
+            </div>
+            <div class="kwic-row forest">
+                <div class="kwic-left"><span class="badge b-arabian">Arabian</span>... he arrived at a thick</div>
+                <div class="kwic-keyword">forest</div>
+                <div class="kwic-right">where he climbed a tall tree ...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function filterKwic() {
+        const selectedValue = document.getElementById('kwic-selector').value;
+        const rows = document.querySelectorAll('.kwic-row');
+
+        rows.forEach(row => {
+            if (row.classList.contains(selectedValue)) {
+                row.classList.add('visible');
+            } else {
+                row.classList.remove('visible');
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENG 6813 · Fairy Tale Text Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf7f2;
+            --ink: #1a1612;
+            --muted: #7a6f65;
+            --border: rgba(26,22,18,0.1);
+            --card: #ffffff;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            min-height: 100vh;
+            padding: 3rem 1.5rem 5rem;
+        }
+        .hero {
+            max-width: 640px;
+            margin: 0 auto 3.5rem;
+            text-align: center;
+        }
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 0.75rem;
+        }
+        .hero p {
+            font-size: 1rem;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+        .course-tag {
+            display: inline-block;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 99px;
+            padding: 4px 14px;
+            margin-bottom: 1.25rem;
+        }
+        .grid {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.25rem;
+        }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.5rem 1.5rem 1.25rem;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            transition: box-shadow 0.2s, transform 0.15s;
+        }
+        .card:hover {
+            box-shadow: 0 8px 24px rgba(26,22,18,0.09);
+            transform: translateY(-2px);
+        }
+        .card-tool {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.68rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 99px;
+            display: inline-block;
+            width: fit-content;
+        }
+        .tool-claude    { background: #d4ede4; color: #1a7a56; }
+        .tool-gemini1   { background: #fde8cc; color: #b85c00; }
+        .tool-gemini2   { background: #fff0d4; color: #9a5000; }
+        .tool-notebooklm{ background: #e3dffa; color: #4a3d9e; }
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        .card-desc {
+            font-size: 0.85rem;
+            color: var(--muted);
+            line-height: 1.6;
+            flex: 1;
+        }
+        .card-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 0.25rem;
+        }
+        .feature-pill {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.68rem;
+            background: rgba(26,22,18,0.05);
+            color: var(--muted);
+            padding: 2px 9px;
+            border-radius: 4px;
+        }
+        .card-arrow {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="hero">
+    <div class="course-tag">ENG 6813 · Distant Reading</div>
+    <h1>Fairy Tale Text Analyses</h1>
+    <p>Comparative distant reading of Andersen's Fairy Tales, Arabian Nights, and Grimms' Fairy Tales — produced by four AI tools.</p>
+</div>
+
+<div class="grid">
+
+    <a class="card" href="index.html">
+        <span class="card-tool tool-claude">Claude</span>
+        <div class="card-title">Fairy Tales · Distant Reading</div>
+        <div class="card-desc">Interactive dashboard with animated bar charts, a per-corpus word cloud, LDA topic model, and a multi-term concordance viewer.</div>
+        <div class="card-features">
+            <span class="feature-pill">Bag of Words</span>
+            <span class="feature-pill">Word Cloud</span>
+            <span class="feature-pill">Topic Model</span>
+            <span class="feature-pill">Concordance</span>
+        </div>
+        <div class="card-arrow">View →</div>
+    </a>
+
+    <a class="card" href="gemini-distant-reading.html">
+        <span class="card-tool tool-gemini1">Gemini</span>
+        <div class="card-title">Distant Reading Analysis Dashboard</div>
+        <div class="card-desc">Two-column layout with a frequency table, static word cloud matrix, four topic cards, and a KWIC concordance dropdown.</div>
+        <div class="card-features">
+            <span class="feature-pill">Frequency Table</span>
+            <span class="feature-pill">Word Cloud</span>
+            <span class="feature-pill">Topics</span>
+            <span class="feature-pill">KWIC</span>
+        </div>
+        <div class="card-arrow">View →</div>
+    </a>
+
+    <a class="card" href="gemini-folklore-dashboard.html">
+        <span class="card-tool tool-gemini2">Gemini</span>
+        <div class="card-title">Folklore Corpora Distant Reading Dashboard</div>
+        <div class="card-desc">Refined dashboard with a scrollable frequency table, weighted word cloud, monospace topic keywords, and color-coded KWIC badges per corpus.</div>
+        <div class="card-features">
+            <span class="feature-pill">Frequency Table</span>
+            <span class="feature-pill">Word Cloud</span>
+            <span class="feature-pill">Topics</span>
+            <span class="feature-pill">KWIC</span>
+        </div>
+        <div class="card-arrow">View →</div>
+    </a>
+
+    <a class="card" href="notebooklm-distant-reading.html">
+        <span class="card-tool tool-notebooklm">NotebookLM</span>
+        <div class="card-title">Distant Reading Analysis Summary</div>
+        <div class="card-desc">Structured written report synthesizing core vocabulary, a conceptual word cloud, four thematic topic clusters, and concordance quotes.</div>
+        <div class="card-features">
+            <span class="feature-pill">Vocabulary</span>
+            <span class="feature-pill">Word Cloud</span>
+            <span class="feature-pill">Topics</span>
+            <span class="feature-pill">Concordance</span>
+        </div>
+        <div class="card-arrow">View →</div>
+    </a>
+
+</div>
+
+</body>
+</html>
