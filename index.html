@@ -1,642 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fairy Tale Distant Reading</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<style>
-:root {
-  --an: #1a7a56;
-  --ar: #b85c00;
-  --gr: #4a3d9e;
-  --an-light: #d4ede4;
-  --ar-light: #fde8cc;
-  --gr-light: #e3dffa;
-  --an-mid: #2ea872;
-  --ar-mid: #e07518;
-  --gr-mid: #6b5fd4;
-  --bg: #faf7f2;
-  --ink: #1a1612;
-  --muted: #7a6f65;
-  --border: rgba(26,22,18,0.1);
-  --card: #ffffff;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; }
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--bg);
-  color: var(--ink);
-  min-height: 100vh;
-}
-
-/* NAV */
-header {
-  background: var(--ink);
-  padding: 0 2rem;
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.logo {
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  color: #fff;
-  font-size: 1.1rem;
-  padding: 1rem 0;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-nav {
-  display: flex;
-  gap: 0;
-  overflow-x: auto;
-}
-nav button {
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.5);
-  font-family: 'DM Mono', monospace;
-  font-size: .72rem;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  padding: .85rem 1.1rem;
-  cursor: pointer;
-  transition: color .2s;
-  white-space: nowrap;
-  border-bottom: 2px solid transparent;
-}
-nav button:hover { color: rgba(255,255,255,0.85); }
-nav button.active { color: #fff; border-bottom-color: #fff; }
-
-/* MAIN */
-main { max-width: 900px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
-
-.panel { display: none; }
-.panel.active { display: block; animation: fadeIn .3s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-
-/* SECTION HEADER */
-.section-header { margin-bottom: 1.75rem; }
-.section-header h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--ink);
-  margin-bottom: .4rem;
-}
-.section-header p {
-  font-size: .9rem;
-  color: var(--muted);
-  line-height: 1.6;
-  max-width: 640px;
-}
-
-/* LEGEND */
-.legend {
-  display: flex;
-  gap: 1.25rem;
-  margin-bottom: 1.25rem;
-  flex-wrap: wrap;
-}
-.legend span {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: .8rem;
-  color: var(--muted);
-  font-family: 'DM Mono', monospace;
-}
-.legend .dot {
-  width: 10px; height: 10px;
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-
-/* CORPUS TOGGLE */
-.corpus-toggle {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-}
-.corpus-btn {
-  padding: 6px 16px;
-  border-radius: 99px;
-  border: 1.5px solid;
-  font-size: .8rem;
-  font-family: 'DM Mono', monospace;
-  cursor: pointer;
-  transition: all .15s;
-  background: none;
-}
-.corpus-btn[data-corpus="Andersen"] { border-color: var(--an); color: var(--an); }
-.corpus-btn[data-corpus="Andersen"].active { background: var(--an); color: #fff; }
-.corpus-btn[data-corpus="Arabian"] { border-color: var(--ar); color: var(--ar); }
-.corpus-btn[data-corpus="Arabian"].active { background: var(--ar); color: #fff; }
-.corpus-btn[data-corpus="Grimms"] { border-color: var(--gr); color: var(--gr); }
-.corpus-btn[data-corpus="Grimms"].active { background: var(--gr); color: #fff; }
-
-/* CHART CARD */
-.chart-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-.chart-card h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1rem;
-  margin-bottom: 1.25rem;
-  color: var(--ink);
-}
-
-/* BOW BARS */
-.bow-list { list-style: none; }
-.bow-item {
-  display: grid;
-  grid-template-columns: 110px 1fr 48px;
-  align-items: center;
-  gap: 10px;
-  padding: 4px 0;
-}
-.bow-label {
-  font-family: 'DM Mono', monospace;
-  font-size: .78rem;
-  text-align: right;
-  color: var(--muted);
-}
-.bow-track {
-  height: 14px;
-  background: rgba(0,0,0,0.05);
-  border-radius: 3px;
-  overflow: hidden;
-}
-.bow-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width .5s cubic-bezier(.4,0,.2,1);
-}
-.bow-val {
-  font-family: 'DM Mono', monospace;
-  font-size: .78rem;
-  color: var(--muted);
-}
-
-/* WORD CLOUD */
-.cloud-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  padding: 1.5rem;
-  min-height: 220px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  justify-content: center;
-  line-height: 1.6;
-}
-.cloud-word {
-  cursor: default;
-  transition: opacity .2s, transform .15s;
-  font-family: 'Playfair Display', serif;
-  display: inline-block;
-}
-.cloud-word:hover { opacity: 0.7; transform: scale(1.08); }
-
-/* TOPIC MODEL */
-.topics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
-}
-.topic-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 1rem 1.1rem;
-}
-.topic-number {
-  font-family: 'DM Mono', monospace;
-  font-size: .68rem;
-  color: var(--muted);
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-.topic-label {
-  font-size: .9rem;
-  font-weight: 500;
-  margin-bottom: 8px;
-  line-height: 1.3;
-}
-.topic-words {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-.topic-pill {
-  font-size: .72rem;
-  font-family: 'DM Mono', monospace;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: rgba(0,0,0,0.05);
-  color: var(--muted);
-}
-.topic-badge {
-  display: inline-block;
-  font-size: .65rem;
-  font-family: 'DM Mono', monospace;
-  padding: 2px 8px;
-  border-radius: 99px;
-  margin-bottom: 8px;
-  letter-spacing: .04em;
-}
-
-/* CONCORDANCE */
-.term-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 1.5rem;
-}
-.term-btn {
-  font-family: 'DM Mono', monospace;
-  font-size: .78rem;
-  padding: 5px 14px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  cursor: pointer;
-  transition: all .15s;
-  color: var(--muted);
-}
-.term-btn:hover { border-color: var(--ink); color: var(--ink); }
-.term-btn.active { background: var(--ink); color: #fff; border-color: var(--ink); }
-
-.freq-bars { margin-bottom: 1.5rem; }
-.freq-item {
-  display: grid;
-  grid-template-columns: 90px 1fr 44px;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-}
-.freq-label { font-family: 'DM Mono', monospace; font-size: .78rem; text-align: right; }
-.freq-track { height: 16px; background: rgba(0,0,0,0.05); border-radius: 3px; overflow: hidden; }
-.freq-fill { height: 100%; border-radius: 3px; transition: width .4s ease; }
-.freq-val { font-family: 'DM Mono', monospace; font-size: .78rem; color: var(--muted); }
-
-.conc-lines { display: flex; flex-direction: column; gap: 8px; }
-.conc-line {
-  display: grid;
-  grid-template-columns: 80px 1fr auto 1fr;
-  gap: 8px 12px;
-  align-items: baseline;
-  font-size: .85rem;
-  padding: 8px 12px;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
-.conc-corpus {
-  font-family: 'DM Mono', monospace;
-  font-size: .68rem;
-  text-align: right;
-  letter-spacing: .04em;
-}
-.conc-left { text-align: right; color: var(--muted); font-size: .82rem; }
-.conc-kw { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700; font-size: 1rem; white-space: nowrap; }
-.conc-right { color: var(--muted); font-size: .82rem; }
-.corpus-tag {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: .68rem;
-  font-family: 'DM Mono', monospace;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENG 6813 · Fairy Tale Text Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #faf7f2;
+            --ink: #1a1612;
+            --muted: #7a6f65;
+            --border: rgba(26,22,18,0.1);
+            --card: #ffffff;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            min-height: 100vh;
+            padding: 3rem 1.5rem 5rem;
+        }
+        .hero {
+            max-width: 640px;
+            margin: 0 auto 3.5rem;
+            text-align: center;
+        }
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 0.75rem;
+        }
+        .hero p {
+            font-size: 1rem;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+        .course-tag {
+            display: inline-block;
+            font-family: 'DM Mono', monospace;
+            font-size: 0.72rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 99px;
+            padding: 4px 14px;
+            margin-bottom: 1.25rem;
+        }
+        .grid {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.25rem;
+        }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.5rem 1.5rem 1.25rem;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            transition: box-shadow 0.2s, transform 0.15s;
+        }
+        .card:hover {
+            box-shadow: 0 8px 24px rgba(26,22,18,0.09);
+            transform: translateY(-2px);
+        }
+        .card-tool {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.68rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 99px;
+            display: inline-block;
+            width: fit-content;
+        }
+        .tool-claude    { background: #d4ede4; color: #1a7a56; }
+        .tool-gemini1   { background: #fde8cc; color: #b85c00; }
+        .tool-gemini2   { background: #fff0d4; color: #9a5000; }
+        .tool-notebooklm{ background: #e3dffa; color: #4a3d9e; }
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+        .card-desc {
+            font-size: 0.85rem;
+            color: var(--muted);
+            line-height: 1.6;
+            flex: 1;
+        }
+        .card-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 0.25rem;
+        }
+        .feature-pill {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.68rem;
+            background: rgba(26,22,18,0.05);
+            color: var(--muted);
+            padding: 2px 9px;
+            border-radius: 4px;
+        }
+        .card-arrow {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 0.5rem;
+        }
+    </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">Fairy Tales · Distant Reading</div>
-  <nav>
-    <button class="active" onclick="showPanel('bow', this)">Bag of Words</button>
-    <button onclick="showPanel('cloud', this)">Word Cloud</button>
-    <button onclick="showPanel('topics', this)">Topic Model</button>
-    <button onclick="showPanel('conc', this)">Concordance</button>
-  </nav>
-</header>
-
-<main>
-
-<!-- BAG OF WORDS -->
-<div id="bow" class="panel active">
-  <div class="section-header">
-    <h2>Bag of words</h2>
-    <p>Top 25 content words per corpus, stopwords removed. Select a corpus to explore its most frequent terms.</p>
-  </div>
-  <div class="corpus-toggle">
-    <button class="corpus-btn active" data-corpus="Andersen" onclick="setBow('Andersen',this)">Andersen</button>
-    <button class="corpus-btn" data-corpus="Arabian" onclick="setBow('Arabian',this)">Arabian Nights</button>
-    <button class="corpus-btn" data-corpus="Grimms" onclick="setBow('Grimms',this)">Grimms</button>
-  </div>
-  <div class="chart-card">
-    <ul class="bow-list" id="bow-list"></ul>
-  </div>
+<div class="hero">
+    <div class="course-tag">ENG 6813 · Distant Reading</div>
+    <h1>Fairy Tale Text Analyses</h1>
+    <p>Comparative distant reading of Andersen's Fairy Tales, Arabian Nights, and Grimms' Fairy Tales — produced by four AI tools.</p>
 </div>
 
-<!-- WORD CLOUD -->
-<div id="cloud" class="panel">
-  <div class="section-header">
-    <h2>Word cloud</h2>
-    <p>Font size reflects word frequency. Select a corpus to see its distinctive vocabulary.</p>
-  </div>
-  <div class="corpus-toggle">
-    <button class="corpus-btn active" data-corpus="Andersen" onclick="setCloud('Andersen',this)">Andersen</button>
-    <button class="corpus-btn" data-corpus="Arabian" onclick="setCloud('Arabian',this)">Arabian Nights</button>
-    <button class="corpus-btn" data-corpus="Grimms" onclick="setCloud('Grimms',this)">Grimms</button>
-  </div>
-  <div class="cloud-container" id="cloud-container"></div>
+<div class="grid">
+
+    <a class="card" href="claude-findings.html">
+        <span class="card-tool tool-claude">Claude</span>
+        <div class="card-title">Key Findings · Distant Reading</div>
+        <div class="card-desc">Five annotated Chart.js bar charts comparing authority words, interiority vs. action, corpus-exclusive signature words, family roles, and the natural world.</div>
+        <div class="card-features">
+            <span class="feature-pill">5 Findings</span>
+            <span class="feature-pill">Bar Charts</span>
+            <span class="feature-pill">Cross-corpus</span>
+        </div>
+        <div class="card-arrow">View →</div>
+    </a>
+
+    <a class="card" href="claude-distant-reading.html">
+        <span class="card-tool tool-claude">Claude</span>
+        <div class="card-title">Fairy Tales · Distant Reading</div>
+        <div class="card-desc">Interactive dashboard with animated bar charts, a per-corpus word cloud, LDA topic model, and a multi-term concordance viewer.</div>
+        <div class="card-features">
+            <span class="feature-pill">Bag of Words</span>
+            <span class="feature-pill">Word Cloud</span>
+            <span class="feature-pill">Topic Model</span>
+            <span class="feature-pill">Concordance</span>
+        </div>
+        <div class="card-arrow">View →</div>
+    </a>
+
+    <a class="card" href="gemini-distant-reading.html">
+        <span class="card-tool tool-gemini1">Gemini</span>
+        <div class="card-title">Distant Reading Analysis Dashboard</div>
+        <div class="card-desc">Two-column layout with a frequency table, static word cloud matrix, four topic cards, and a KWIC concordance dropdown.</div>
+        <div class="card-features">
+            <span class="feature-pill">Frequency Table</span>
+            <span class="feature-pill">Word Cloud</span>
+            <span class="feature-pill">Topics</span>
+            <span class="feature-pill">KWIC</span>
+        </div>
+        <div class="card-arrow">View →</div>
+    </a>
+
+    <a class="card" href="gemini-folklore-dashboard.html">
+        <span class="card-tool tool-gemini2">Gemini</span>
+        <div class="card-title">Folklore Corpora Distant Reading Dashboard</div>
+        <div class="card-desc">Refined dashboard with a scrollable frequency table, weighted word cloud, monospace topic keywords, and color-coded KWIC badges per corpus.</div>
+        <div class="card-features">
+            <span class="feature-pill">Frequency Table</span>
+            <span class="feature-pill">Word Cloud</span>
+            <span class="feature-pill">Topics</span>
+            <span class="feature-pill">KWIC</span>
+        </div>
+        <div class="card-arrow">View →</div>
+    </a>
+
+    <a class="card" href="notebooklm-distant-reading.html">
+        <span class="card-tool tool-notebooklm">NotebookLM</span>
+        <div class="card-title">Distant Reading Analysis Summary</div>
+        <div class="card-desc">Structured written report synthesizing core vocabulary, a conceptual word cloud, four thematic topic clusters, and concordance quotes.</div>
+        <div class="card-features">
+            <span class="feature-pill">Vocabulary</span>
+            <span class="feature-pill">Word Cloud</span>
+            <span class="feature-pill">Topics</span>
+            <span class="feature-pill">Concordance</span>
+        </div>
+        <div class="card-arrow">View →</div>
+    </a>
+
+    <a class="card" href="notebooklm-infographic.html">
+        <span class="card-tool tool-notebooklm">NotebookLM</span>
+        <div class="card-title">Fairy Tale DNA: A Comparative Anatomy</div>
+        <div class="card-desc">Infographic comparing dominant settings, royal archetypes, magical motifs, sacred numerology (3, 12, 40), and symbolic icons across the three traditions.</div>
+        <div class="card-features">
+            <span class="feature-pill">Infographic</span>
+            <span class="feature-pill">Archetypes</span>
+            <span class="feature-pill">Motifs</span>
+            <span class="feature-pill">Numerology</span>
+        </div>
+        <div class="card-arrow">View →</div>
+    </a>
+
 </div>
 
-<!-- TOPIC MODEL -->
-<div id="topics" class="panel">
-  <div class="section-header">
-    <h2>Topic model</h2>
-    <p>8 topics extracted via LDA across all three corpora. Each topic is a cluster of co-occurring words; the label is interpretive.</p>
-  </div>
-  <div class="topics-grid" id="topics-grid"></div>
-  <p style="font-size:.8rem;color:var(--muted);margin-top:1rem">Topic 4 captures Project Gutenberg boilerplate — metadata rather than narrative content.</p>
-</div>
-
-<!-- CONCORDANCE -->
-<div id="conc" class="panel">
-  <div class="section-header">
-    <h2>Concordance</h2>
-    <p>Select a keyword to see how it appears across all three traditions — frequency and context.</p>
-  </div>
-  <div class="term-grid" id="term-grid"></div>
-  <div class="chart-card">
-    <h3>Frequency across corpora</h3>
-    <div class="freq-bars" id="freq-bars"></div>
-  </div>
-  <div class="chart-card">
-    <h3>Concordance lines</h3>
-    <div class="conc-lines" id="conc-lines"></div>
-  </div>
-</div>
-
-</main>
-
-<script>
-const BOW = {
-  Andersen: [['gerda',122],['tree',99],['princess',84],['shadow',83],['shoes',79],['boy',77],['kay',72],['mother',59],['world',58],['heart',51],['home',48],['snow',46],['saw',45],['night',44],['poor',43],['water',43],['door',40],['house',39],['eyes',38],['death',29],['beautiful',56],['quite',107],['stood',85],['large',102],['yes',79]],
-  Arabian: [['sultan',349],['aladdin',327],['princess',290],['palace',214],['son',182],['prince',158],['mother',158],['magician',113],['baba',131],['vizier',120],['gold',110],['ali',110],['genie',108],['god',119],['sea',110],['lamp',90],['death',78],['water',73],['bird',71],['heart',28],['soon',180],['found',160],['two',159],['returned',117],['tell',117]],
-  Grimms: [['king',368],['father',182],['home',178],['cried',153],['wife',147],['mother',133],['door',129],['beautiful',122],['bird',121],['son',114],['water',113],['princess',103],['gold',89],['forest',85],['heart',73],['fell',130],['well',161],['last',147],['two',145],['way',143],['still',127],['till',125],['set',124],['nothing',121],['ran',119]]
-};
-
-const COLORS = { Andersen: '#1a7a56', Arabian: '#b85c00', Grimms: '#4a3d9e' };
-const LIGHT = { Andersen: '#d4ede4', Arabian: '#fde8cc', Grimms: '#e3dffa' };
-
-let activeBow = 'Andersen';
-let activeCloud = 'Andersen';
-let activeTerm = 'princess';
-
-function showPanel(id, btn) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  btn.classList.add('active');
-}
-
-/* ---- BOW ---- */
-function setBow(corpus, btn) {
-  activeBow = corpus;
-  document.querySelectorAll('#bow .corpus-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderBow();
-}
-
-function renderBow() {
-  const data = BOW[activeBow].slice().sort((a,b) => b[1]-a[1]).slice(0,25);
-  const max = data[0][1];
-  const color = COLORS[activeBow];
-  const list = document.getElementById('bow-list');
-  list.innerHTML = data.map(([w,c]) => `
-    <li class="bow-item">
-      <span class="bow-label">${w}</span>
-      <div class="bow-track"><div class="bow-fill" style="width:0%;background:${color}" data-pct="${Math.round(c/max*100)}"></div></div>
-      <span class="bow-val">${c}</span>
-    </li>`).join('');
-  requestAnimationFrame(() => {
-    document.querySelectorAll('.bow-fill').forEach(el => {
-      el.style.width = el.dataset.pct + '%';
-    });
-  });
-}
-
-/* ---- CLOUD ---- */
-function setCloud(corpus, btn) {
-  activeCloud = corpus;
-  document.querySelectorAll('#cloud .corpus-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderCloud();
-}
-
-function renderCloud() {
-  const data = BOW[activeCloud].slice().sort((a,b) => b[1]-a[1]).slice(0,45);
-  const max = data[0][1];
-  const color = COLORS[activeCloud];
-  const stops = ['#0a4a33','#1a7a56','#2ea872','#5dcaa5','#9fe1cb',
-                 '#7a3d00','#b85c00','#e07518','#f5a94a','#fde8cc',
-                 '#2a1e7a','#4a3d9e','#6b5fd4','#afa9ec','#e3dffa'];
-  const palette = activeCloud === 'Andersen' ? stops.slice(0,5) :
-                  activeCloud === 'Arabian'  ? stops.slice(5,10) : stops.slice(10,15);
-  const container = document.getElementById('cloud-container');
-  container.innerHTML = '';
-  // Shuffle slightly for visual interest
-  const shuffled = data.map((d,i)=>({d,i})).sort(()=>Math.random()-.3).map(x=>x.d);
-  shuffled.forEach(([w,c]) => {
-    const size = 11 + Math.round((c/max) * 34);
-    const colIdx = Math.floor(Math.random() * palette.length);
-    const span = document.createElement('span');
-    span.className = 'cloud-word';
-    span.textContent = w;
-    span.style.fontSize = size + 'px';
-    span.style.color = palette[colIdx];
-    span.style.fontWeight = size > 28 ? '700' : size > 20 ? '400' : '300';
-    span.title = `${w}: ${c} occurrences`;
-    container.appendChild(span);
-  });
-}
-
-/* ---- TOPICS ---- */
-const TOPICS = [
-  { label:'Soldier & fairy tale hero', corpus:'cross', words:['man','princess','shadow','soldier','fisherman','water','wife','sea','prince','go','say','way'] },
-  { label:'Andersen — Snow Queen', corpus:'Andersen', words:['tree','red','gerda','looked','large','quite','mother','stood','snow','oh','white','hans'] },
-  { label:'Aladdin & the lamp', corpus:'Arabian', words:['sultan','aladdin','princess','palace','mother','son','magician','vizier','lamp','grand','genie','go'] },
-  { label:'Gutenberg metadata', corpus:'meta', words:['gutenberg','project','work','works','electronic','foundation','terms','copyright','states','agreement','license','united'] },
-  { label:'Grimms — kings & quests', corpus:'Grimms', words:['king','go','saw','man','father','cried','take','home','door','way','give','bird'] },
-  { label:'Sinbad — sea voyages', corpus:'Arabian', words:['found','island','sea','saw','brought','ship','several','young','fish','sinbad','carried','days'] },
-  { label:'Arabian — princes & courts', corpus:'Arabian', words:['emperor','baba','princess','ali','prince','codadad','queen','princes','house','wife','bird','brother'] },
-  { label:'Arabian — Islamic world', corpus:'Arabian', words:['king','god','sea','emeer','hath','city','son','people','sheikh','moosa','therefore','solomon'] },
-];
-
-function buildTopics() {
-  const grid = document.getElementById('topics-grid');
-  TOPICS.forEach((t,i) => {
-    const color = t.corpus === 'Andersen' ? COLORS.Andersen :
-                  t.corpus === 'Arabian'  ? COLORS.Arabian :
-                  t.corpus === 'Grimms'   ? COLORS.Grimms :
-                  t.corpus === 'cross'    ? '#555' : '#999';
-    const bgLight = t.corpus === 'Andersen' ? LIGHT.Andersen :
-                    t.corpus === 'Arabian'  ? LIGHT.Arabian :
-                    t.corpus === 'Grimms'   ? LIGHT.Grimms :
-                    t.corpus === 'cross'    ? '#eee' : '#f5f5f5';
-    const badgeLabel = t.corpus === 'cross' ? 'cross-corpus' :
-                       t.corpus === 'meta'  ? 'metadata' : t.corpus;
-    const card = document.createElement('div');
-    card.className = 'topic-card';
-    card.innerHTML = `
-      <div class="topic-number">Topic ${i+1}</div>
-      <span class="topic-badge" style="background:${bgLight};color:${color}">${badgeLabel}</span>
-      <div class="topic-label">${t.label}</div>
-      <div class="topic-words">${t.words.slice(0,8).map(w=>`<span class="topic-pill">${w}</span>`).join('')}</div>`;
-    grid.appendChild(card);
-  });
-}
-
-/* ---- CONCORDANCE ---- */
-const CONCORDANCE = {
-  princess: {
-    counts: { Andersen:84, Arabian:290, Grimms:103 },
-    lines: [
-      { corpus:'Andersen', left:'yes it is a real', right:'said the princess after the test' },
-      { corpus:'Arabian', left:'aladdin brought the lamp to the', right:'who rubbed it and the genie appeared' },
-      { corpus:'Arabian', left:'the sultan called for the', right:'and she came attended by her women' },
-      { corpus:'Grimms', left:'the', right:'was so beautiful the king could not take his eyes from her' },
-      { corpus:'Grimms', left:'and the', right:'kissed the frog and he became a fine young prince' },
-    ]
-  },
-  shadow: {
-    counts: { Andersen:85, Arabian:0, Grimms:0 },
-    lines: [
-      { corpus:'Andersen', left:'the story of the', right:'it is in the hot lands that' },
-      { corpus:'Andersen', left:'then the', right:'of the learned man said i have grown a man' },
-      { corpus:'Andersen', left:'and the', right:'went off to travel by itself' },
-    ]
-  },
-  king: {
-    counts: { Andersen:28, Arabian:171, Grimms:368 },
-    lines: [
-      { corpus:'Grimms', left:'the', right:'had a daughter who was the most beautiful creature under the sun' },
-      { corpus:'Grimms', left:'the', right:'of the golden mountain then blew his pipe' },
-      { corpus:'Arabian', left:'the history of the young', right:'of the black isles when he came' },
-      { corpus:'Arabian', left:'the', right:'of the black isles then fell weeping' },
-      { corpus:'Andersen', left:'and as of any other', right:'or emperor one is accustomed to say' },
-    ]
-  },
-  heart: {
-    counts: { Andersen:51, Arabian:28, Grimms:73 },
-    lines: [
-      { corpus:'Grimms', left:'with all my', right:'said hans but as you are so kind' },
-      { corpus:'Grimms', left:'what a noble', right:'that good man has thought he then' },
-      { corpus:'Andersen', left:'praised from the very bottom of his', right:'the happy reality our own time' },
-      { corpus:'Arabian', left:'in a transport of joy my', right:'my soul you shall soon be restored' },
-    ]
-  },
-  bird: {
-    counts: { Andersen:16, Arabian:71, Grimms:121 },
-    lines: [
-      { corpus:'Grimms', left:'the golden', right:'hans in luck jorinda and jorindel' },
-      { corpus:'Grimms', left:'and the', right:'flew away into the great dark forest' },
-      { corpus:'Arabian', left:'the talking', right:'the singing tree and the golden water' },
-      { corpus:'Andersen', left:'yes it is a real', right:'said the princess yes it is' },
-    ]
-  },
-  gold: {
-    counts: { Andersen:22, Arabian:110, Grimms:89 },
-    lines: [
-      { corpus:'Arabian', left:'the palace was filled with', right:'and precious stones from every land' },
-      { corpus:'Grimms', left:'the table the ass and the sack of', right:'the eldest son set forth to seek' },
-      { corpus:'Andersen', left:'it was all real', right:'and diamonds and rubies sparkled' },
-    ]
-  },
-  mother: {
-    counts: { Andersen:61, Arabian:158, Grimms:154 },
-    lines: [
-      { corpus:'Arabian', left:'aladdin ran home to tell his', right:'and she was very much astonished' },
-      { corpus:'Grimms', left:'his step', right:'hated him but could not harm him' },
-      { corpus:'Andersen', left:'and gerda asked the old', right:'of the flowers if she had seen' },
-    ]
-  },
-  death: {
-    counts: { Andersen:29, Arabian:78, Grimms:26 },
-    lines: [
-      { corpus:'Arabian', left:'he was condemned to', right:'but at the last moment was reprieved' },
-      { corpus:'Arabian', left:'the penalty was', right:'and the caliph himself pronounced the sentence' },
-      { corpus:'Andersen', left:'she danced on and on and only', right:'could put an end to her sufferings' },
-      { corpus:'Grimms', left:'fell down and', right:'came and took away all the children' },
-    ]
-  },
-};
-
-const TERMS = Object.keys(CONCORDANCE);
-
-function renderConc() {
-  const data = CONCORDANCE[activeTerm];
-  const max = Math.max(...Object.values(data.counts));
-  const bars = document.getElementById('freq-bars');
-  bars.innerHTML = Object.entries(data.counts).map(([corpus, count]) => `
-    <div class="freq-item">
-      <span class="freq-label" style="color:${COLORS[corpus]}">${corpus}</span>
-      <div class="freq-track"><div class="freq-fill" style="width:${count===0?1:Math.round(count/max*100)}%;background:${COLORS[corpus]}" ></div></div>
-      <span class="freq-val">${count}</span>
-    </div>`).join('');
-
-  const lines = document.getElementById('conc-lines');
-  lines.innerHTML = data.lines.map(l => {
-    const bg = LIGHT[l.corpus];
-    const fg = COLORS[l.corpus];
-    return `<div class="conc-line">
-      <span class="conc-corpus"><span class="corpus-tag" style="background:${bg};color:${fg}">${l.corpus}</span></span>
-      <span class="conc-left">…${l.left}</span>
-      <span class="conc-kw" style="color:${fg}">${activeTerm}</span>
-      <span class="conc-right">${l.right}…</span>
-    </div>`;
-  }).join('');
-}
-
-function buildTermGrid() {
-  const grid = document.getElementById('term-grid');
-  TERMS.forEach(t => {
-    const btn = document.createElement('button');
-    btn.className = 'term-btn' + (t === activeTerm ? ' active' : '');
-    btn.textContent = t;
-    btn.onclick = () => {
-      activeTerm = t;
-      document.querySelectorAll('.term-btn').forEach(b => b.classList.toggle('active', b.textContent === t));
-      renderConc();
-    };
-    grid.appendChild(btn);
-  });
-}
-
-// Init
-renderBow();
-renderCloud();
-buildTopics();
-buildTermGrid();
-renderConc();
-</script>
 </body>
 </html>
